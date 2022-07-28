@@ -13,15 +13,18 @@ class obstacles:
                  obs_types=None,
                  num_types=None):
         self.domsize = domsize or []
+        # 传进来的是目的地点
         self.mask = mask or []
         self.dom = dom or np.zeros(self.domsize)
         self.obs_types = obs_types or ["circ", "rect"]
         self.num_types = num_types or len(self.obs_types)
+        # 传进来的是障碍物的最大尺寸
         self.size_max = size_max or np.max(self.domsize) / 4
 
     def check_mask(self, dom=None):
         # Ensure goal is in free space
         if dom is not None:
+            # np.any是对每一个维度的元素做或运算
             return np.any(dom[self.mask[0], self.mask[1]])
         else:
             return np.any(self.dom[self.mask[0], self.mask[1]])
@@ -29,6 +32,8 @@ class obstacles:
     def insert_rect(self, x, y, height, width):
         # Insert a rectangular obstacle into map
         im_try = np.copy(self.dom)
+        # 从x,y开始，延展height和width个各自，并全部赋为1
+        # 1表示障碍物存在的代价
         im_try[x:x + height, y:y + width] = 1
         return im_try
 
@@ -60,6 +65,7 @@ class obstacles:
     def add_border(self):
         # Make full outer border an obstacle
         im_try = np.copy(self.dom)
+        # 有障碍物的格子赋1
         im_try[0:self.domsize[0], 0] = 1
         im_try[0, 0:self.domsize[1]] = 1
         im_try[0:self.domsize[0], self.domsize[1] - 1] = 1
@@ -73,7 +79,10 @@ class obstacles:
     def get_final(self):
         # Process obstacle map for domain
         im = np.copy(self.dom)
+        # 把黑白色颠倒过来
+        # max表示把输入拉直后取得最大值
         im = np.max(im) - im
+        # 如果不止黑白色的话，可以归一化
         im = im / np.max(im)
         return im
 

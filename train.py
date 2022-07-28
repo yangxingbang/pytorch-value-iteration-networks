@@ -18,6 +18,7 @@ def train(net: VIN, trainloader, config, criterion, optimizer):
     print_header()
     # Automatically select device to make the code device agnostic
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    # 做多个epoch，每个epoch
     for epoch in range(config.epochs):  # Loop over dataset multiple times
         avg_error, avg_loss, num_batches = 0.0, 0.0, 0.0
         start_time = time.time()
@@ -73,6 +74,7 @@ def test(net: VIN, testloader, config):
 if __name__ == '__main__':
     # Parsing training parameters
     parser = argparse.ArgumentParser()
+    # 在terminal中命令行输入的时候，可以用 --xxx 指定的参数，假如不指定，运行采用默认值
     parser.add_argument(
         '--datafile',
         type=str,
@@ -102,33 +104,38 @@ if __name__ == '__main__':
         help='Number of channels in q layer (~actions) in VI-module')
     parser.add_argument(
         '--batch_size', type=int, default=128, help='Batch size')
+    # 在terminal中命令行输入的这些参数，就形成了config
     config = parser.parse_args()
     # Get path to save trained model
     save_path = "trained/vin_{0}x{0}.pth".format(config.imsize)
+    # Define Dataset
+    # Dataset transformer: torchvision.transforms
+    train_set = GridworldData(
+        config.datafile, imsize=config.imsize, train=True, transform=None)
+    # 测试的时候设置 train=False
+    test_set = GridworldData(
+        config.datafile,
+        imsize=config.imsize,
+        train=False,
+        transform=None)
+    # Create Dataloader
+    # 训练模型的时候 shuffle=True，测试的时候 shuffle=False
+    # batch_size表示有5个trainset,这5个是一样的吗？
+    train_loader = torch.utils.data.DataLoader(
+        train_set, batch_size=config.batch_size, shuffle=True, num_workers=0)
+    test_loader = torch.utils.data.DataLoader(
+        test_set, batch_size=config.batch_size, shuffle=False, num_workers=0)
     # Instantiate a VIN model
     net = VIN(config)
     # Loss
     criterion = nn.CrossEntropyLoss()
     # Optimizer
     optimizer = optim.RMSprop(net.parameters(), lr=config.lr, eps=1e-6)
-    # Dataset transformer: torchvision.transforms
-    transform = None
-    # Define Dataset
-    trainset = GridworldData(
-        config.datafile, imsize=config.imsize, train=True, transform=transform)
-    testset = GridworldData(
-        config.datafile,
-        imsize=config.imsize,
-        train=False,
-        transform=transform)
-    # Create Dataloader
-    trainloader = torch.utils.data.DataLoader(
-        trainset, batch_size=config.batch_size, shuffle=True, num_workers=0)
-    testloader = torch.utils.data.DataLoader(
-        testset, batch_size=config.batch_size, shuffle=False, num_workers=0)
+    # 因为本例中没有dropout，normalization等模块，所以没有添加
+    # torch.train()和torch.eval()两个函数，也是没有问题的
     # Train the model
-    train(net, trainloader, config, criterion, optimizer)
+    train(net, train_loader, config, criterion, optimizer)
     # Test accuracy
-    test(net, testloader, config)
+    test(net, test_loader, config)
     # Save the trained model parameters
     torch.save(net.state_dict(), save_path)

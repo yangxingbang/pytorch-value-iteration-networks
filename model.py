@@ -11,6 +11,9 @@ class VIN(nn.Module):
     def __init__(self, config):
         super(VIN, self).__init__()
         self.config = config
+        # l_i: Number of channels in input layer. Default: 2, i.e. obstacles image and goal image.
+        # l_h: Number of channels in first convolutional layer. Default: 150, described in paper.
+        # l_q: Number of channels in q layer (~actions) in VI-module. Default: 10, described in paper.
         self.h = nn.Conv2d(
             in_channels=config.l_i,
             out_channels=config.l_h,
@@ -53,6 +56,7 @@ class VIN(nn.Module):
         def eval_q(r, v):
             return F.conv2d(
                 # Stack reward with most recent value
+                # 把r和v沿第1维的方向拼接
                 torch.cat([r, v], 1),
                 # Convolve r->q weights to r, and v->q weights for v. These represent transition probabilities
                 torch.cat([self.q.weight, self.w], 1),
