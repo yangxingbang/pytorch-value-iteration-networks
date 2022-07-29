@@ -120,7 +120,7 @@ if __name__ == '__main__':
         transform=None)
     # Create Dataloader
     # 训练模型的时候 shuffle=True，测试的时候 shuffle=False
-    # batch_size表示有5个trainset,这5个是一样的吗？
+    # batch_size表示有5个train_set,这5个是一样的吗？
     train_loader = torch.utils.data.DataLoader(
         train_set, batch_size=config.batch_size, shuffle=True, num_workers=0)
     test_loader = torch.utils.data.DataLoader(
