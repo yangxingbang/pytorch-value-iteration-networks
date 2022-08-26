@@ -11,8 +11,8 @@ import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 from dataset.dataset import *
 from utility.utils import *
+from torch.utils.tensorboard import SummaryWriter
 from model import *
-
 
 def train(net: VIN, trainloader, config, criterion, optimizer):
     print_header()
@@ -30,9 +30,12 @@ def train(net: VIN, trainloader, config, criterion, optimizer):
             net = net.to(device)
             # Zero the parameter gradients
             optimizer.zero_grad()
+            k_tensor = torch.tensor(config.k)
+            writer.add_graph(net, input_to_model=[X, S1, S2, k_tensor])
             # Forward pass
             outputs, predictions = net(X, S1, S2, config.k)
             # Loss
+            # 计算了某个状态下VIN网络得出的动作和A星算法得出的动作的cross entropy
             loss = criterion(outputs, labels)
             # Backward pass
             loss.backward()
@@ -40,9 +43,13 @@ def train(net: VIN, trainloader, config, criterion, optimizer):
             optimizer.step()
             # Calculate Loss and Error
             loss_batch, error_batch = get_stats(loss, predictions, labels)
+            writer.add_scalar("every batch train loss", loss_batch, i)
+            writer.add_scalar("every batch error", error_batch, i)
             avg_loss += loss_batch
             avg_error += error_batch
             num_batches += 1
+        writer.add_scalar("each epoch train loss", avg_loss / (epoch + 1), epoch)
+        writer.add_scalar("each epoch train error", avg_error / (epoch + 1), epoch)
         time_duration = time.time() - start_time
         # Print epoch logs
         print_stats(epoch, avg_loss, avg_error, num_batches, time_duration)
@@ -125,6 +132,7 @@ if __name__ == '__main__':
         train_set, batch_size=config.batch_size, shuffle=True, num_workers=0)
     test_loader = torch.utils.data.DataLoader(
         test_set, batch_size=config.batch_size, shuffle=False, num_workers=0)
+    writer = SummaryWriter("logs")
     # Instantiate a VIN model
     net = VIN(config)
     # Loss
@@ -133,8 +141,10 @@ if __name__ == '__main__':
     optimizer = optim.RMSprop(net.parameters(), lr=config.lr, eps=1e-6)
     # 因为本例中没有dropout，normalization等模块，所以没有添加
     # torch.train()和torch.eval()两个函数，也是没有问题的
+    # VIN输出的是每个状态的action
     # Train the model
     train(net, train_loader, config, criterion, optimizer)
+    writer.close()
     # Test accuracy
     test(net, test_loader, config)
     # Save the trained model parameters

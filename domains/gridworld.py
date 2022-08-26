@@ -100,11 +100,13 @@ class GridWorld:
 
         return G_non_obstacles, W_non_obstacles, P_non_obstacles, R_non_obstacles, state_map_row, state_map_col
 
+        '''
     def get_graph(self):
         # Returns graph
         G = self.G
         W = self.W[self.W != 0]
         return G, W
+        '''
 
     def get_graph_inv(self):
         # Returns transpose of graph
@@ -112,6 +114,7 @@ class GridWorld:
         W = self.W.T
         return G, W
 
+        '''
     def val_2_image(self, val):
         # Zeros for obstacles, val for free space
         im = np.zeros((self.n_row, self.n_col))
@@ -127,6 +130,7 @@ class GridWorld:
             np.square(s_map_col - self.target_y) +
             np.square(s_map_row - self.target_x))
         return im
+        '''
 
     def get_reward_prior(self):
         # Returns reward prior for gridworld
@@ -142,12 +146,14 @@ class GridWorld:
         im[self.target_x, self.target_y] = 10
         return im
 
+        '''
     def get_state_image(self, row, col):
         # Zeros everywhere except [row,col]
         im = np.zeros((self.n_row, self.n_col))
         # 对应行列的值设为1
         im[row, col] = 1
         return im
+        '''
 
     def map_ind_to_state(self, row, col):
         # Takes [row, col] and maps to a state
@@ -192,9 +198,11 @@ class GridWorld:
         result = self.rand_choose(vec)
         return result
 
+        '''
     def get_size(self):
         # Returns domain size
         return self.n_row, self.n_col
+        '''
 
     def move(self, row, col, action):
         # Returns new [row,col]

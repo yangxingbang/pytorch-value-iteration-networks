@@ -54,7 +54,6 @@ def extract_action(traj):
     actions = np.dot(actions_one_hot, np.arange(n_actions).T)
     print("actions: \n", actions)
     # 返回了每条轨迹中从起点到终点，每走一个格子的动作是action_vecs的第几个
-    # 有必要搞得这么复杂吗？它的兼容性在哪儿？
     return actions
 
 # state_batch_size在生成数据的时候未被使用

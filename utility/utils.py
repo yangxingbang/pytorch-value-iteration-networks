@@ -17,7 +17,10 @@ def fmt_item(x, l):
 
 
 def get_stats(loss, predictions, labels):
+    # 8个可能动作中只最大的那个作为结果动作，取它的索引
     cp = np.argmax(predictions.cpu().data.numpy(), 1)
+    # 求 cp 和 labels 不相等 占 （相等+不相等） 的比率， 就能表示出整个序列中有多少比例的动作是不一致的
+    # 这样评价误差能得到神经网络计算出的路径和最短路径的差异有多大
     error = np.mean(cp != labels.cpu().data.numpy())
     return loss.item(), error
 
