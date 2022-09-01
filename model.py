@@ -90,8 +90,9 @@ class VIN(nn.Module):
         q_np_array = np.array(q.data.cpu())
         # q: (batch_sz, l_q, map_size, map_size)
         batch_sz, l_q, _, _ = q.size()
-        # Attention: choose Q values for current state ？
-        # q_out = q[torch.arange(batch_sz), :, state_x.long(), state_y.long()].view(batch_sz, l_q)
+        # Attention: choose Q values for current state
+        # 对于第1笔数据的每1个通道，都取行为state_x第1个元素，列为state_y第1个元素的数据；
+        # 对于第2笔数据的每1个通道，都取行为state_x第2个元素，列为state_y第2个元素的数据；
         q_out = q[torch.arange(batch_sz), :, state_x.long(), state_y.long()]
         q_out_np_array = np.array(q_out.data.cpu())
 

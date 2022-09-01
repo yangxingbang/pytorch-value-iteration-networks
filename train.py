@@ -22,9 +22,11 @@ def train(net: VIN, trainloader, config, criterion, optimizer):
     for epoch in range(config.epochs):  # Loop over dataset multiple times
         avg_error, avg_loss, num_batches = 0.0, 0.0, 0.0
         start_time = time.time()
+        print("loop numbers in each epoch: ", enumerate(trainloader))
         for i, data in enumerate(trainloader):  # Loop over batches of data
             # Get input batch
             X, S1, S2, labels = [d.to(device) for d in data]
+            x_nparray = np.array(X.data.cpu())
             if X.size()[0] != config.batch_size:
                 continue  # Drop those data, if not enough for a batch
             net = net.to(device)
@@ -110,7 +112,7 @@ if __name__ == '__main__':
         default=10,
         help='Number of channels in q layer (~actions) in VI-module')
     parser.add_argument(
-        '--batch_size', type=int, default=128, help='Batch size')
+        '--batch_size', type=int, default=16, help='Batch size')
     # 在terminal中命令行输入的这些参数，就形成了config
     config = parser.parse_args()
     # Get path to save trained model

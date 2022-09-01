@@ -28,7 +28,7 @@ def extract_action(traj):
     state_diff = np.diff(traj, axis=0)
     # 给坐标位置差求平方
     state_diff_square = np.square(state_diff)
-    print("state_diff_square: \n", state_diff_square)
+    # print("state_diff_square: \n", state_diff_square)
     # axis=1 表示把第二维度的每一行加起来
     # 比如 [[1 1] [1 1] [0 1]]，按第二维度加起来得到[2 2 1]，tensor降低了一个维度
     state_diff_square_sum = np.sum(state_diff_square, axis=1)
@@ -52,7 +52,7 @@ def extract_action(traj):
     # print("actions_one_hot: \n", actions_one_hot)
     # print("np.arange(n_actions).T: \n", np.arange(n_actions).T)
     actions = np.dot(actions_one_hot, np.arange(n_actions).T)
-    print("actions: \n", actions)
+    # print("actions: \n", actions)
     # 返回了每条轨迹中从起点到终点，每走一个格子的动作是action_vecs的第几个
     return actions
 
@@ -66,6 +66,8 @@ def make_data(dom_size, n_domains, max_obs, max_obs_size, n_traj,
     Labels_l = []
 
     dom = 0.0
+    # 一个domains中有一张地图，一个目的地点，几个障碍物，多个起始点
+    # 一个domains，一个trajectory中有一张地图，一个目的地点，几个障碍物，一个起点
     # 每生成1个栅格地图，在里边指定设定的多条轨迹；然后生成另1个栅格地图
     while dom <= n_domains:
         # 随机生成一个目标点，坐标是整型的x，y
@@ -101,6 +103,7 @@ def make_data(dom_size, n_domains, max_obs, max_obs_size, n_traj,
                 actions = extract_action(states_xy[i])
                 # 表示某条轨迹从起点到终点走了几步
                 ns = states_xy[i].shape[0] - 1
+                # print("ns: ", ns)
                 # Invert domain image => 0 = free, 1 = obstacle
                 image = 1 - im
                 # print("image: \n", image)
@@ -136,6 +139,7 @@ def make_data(dom_size, n_domains, max_obs, max_obs_size, n_traj,
     S1_f = np.concatenate(S1_l)
     S2_f = np.concatenate(S2_l)
     Labels_f = np.concatenate(Labels_l)
+    print("X_f.shape: ", X_f.shape)
     return X_f, S1_f, S2_f, Labels_f
 
 
@@ -170,12 +174,12 @@ if __name__ == '__main__':
     # default 28
     parser.add_argument("--size", "-s", type=int, help="size of the domain", default=8)
     # default 5000
-    parser.add_argument("--n_domains", "-nd", type=int, help="number of domains", default=100)
+    parser.add_argument("--n_domains", "-nd", type=int, help="number of domains", default=7)
     # default 50
-    parser.add_argument("--max_obs", "-no", type=int, help="maximum number of obstacles", default=10)
+    parser.add_argument("--max_obs", "-no", type=int, help="maximum number of obstacles", default=3)
     parser.add_argument("--max_obs_size", "-os", type=int, help="maximum obstacle size", default=3)
     # default 7
-    parser.add_argument("--n_traj", "-nt", type=int, help="number of trajectories", default=7)
+    parser.add_argument("--n_traj", "-nt", type=int, help="number of trajectories", default=4)
     parser.add_argument("--state_batch_size", "-bs", type=int, help="state batch size", default=1)
 
     args = parser.parse_args()
