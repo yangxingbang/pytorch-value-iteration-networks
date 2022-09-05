@@ -49,7 +49,7 @@ class VIN(nn.Module):
         :param k: number of iterations
         :return: logits and softmaxed logits
         """
-        # 障碍物地图和目的地点地图经过两次卷积得到了奖赏R
+        # 障碍物地图和目的地点地图(reward function prior)经过两次卷积得到了奖赏R
         h = self.h(input_view)  # Intermediate output
         r = self.r(h)           # Reward
         # 奖赏经过一次卷积得到了Q的初始值

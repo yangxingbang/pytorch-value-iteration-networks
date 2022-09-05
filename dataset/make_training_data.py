@@ -174,12 +174,12 @@ if __name__ == '__main__':
     # default 28
     parser.add_argument("--size", "-s", type=int, help="size of the domain", default=8)
     # default 5000
-    parser.add_argument("--n_domains", "-nd", type=int, help="number of domains", default=7)
+    parser.add_argument("--n_domains", "-nd", type=int, help="number of domains", default=500)
     # default 50
     parser.add_argument("--max_obs", "-no", type=int, help="maximum number of obstacles", default=3)
     parser.add_argument("--max_obs_size", "-os", type=int, help="maximum obstacle size", default=3)
     # default 7
-    parser.add_argument("--n_traj", "-nt", type=int, help="number of trajectories", default=4)
+    parser.add_argument("--n_traj", "-nt", type=int, help="number of trajectories", default=6)
     parser.add_argument("--state_batch_size", "-bs", type=int, help="state batch size", default=1)
 
     args = parser.parse_args()
