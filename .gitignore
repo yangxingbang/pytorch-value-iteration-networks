@@ -111,3 +111,7 @@ venv.bak/
 
 # jetbrains project settings
 .idea
+
+# vin
+__pycache__/
+logs/
